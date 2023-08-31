@@ -1,0 +1,178 @@
+1.	// Include headers  
+
+2.	#include<stdio.h>  
+
+3.	#include<string.h>  
+
+4.	// length of the generator polynomial  
+
+5.	#define N strlen(gen_poly)  
+
+6.	// data to be transmitted and received  
+
+7.	char data[28];  
+
+8.	// CRC value  
+
+9.	char check_value[28];  
+
+10.	// generator polynomial  
+
+11.	char gen_poly[10];  
+
+12.	// variables   
+
+13.	int data_length,i,j;  
+
+14.	// function that performs XOR operation  
+
+15.	void XOR(){  
+
+16.	    // if both bits are the same, the output is 0  
+
+17.	    // if the bits are different the output is 1  
+
+18.	    for(j = 1;j < N; j++)  
+
+19.	    check_value[j] = (( check_value[j] == gen_poly[j])?'0':'1');  
+
+20.	      
+
+21.	}  
+
+22.	// Function to check for errors on the receiver side  
+
+23.	void crc();
+
+24.	void receiver(){  
+
+25.	// get the received data  
+
+26.	    printf("Enter the received data: ");  
+
+27.	    scanf("%s", data);  
+
+28.	    printf("\n-----------------------------\n");  
+
+29.	    printf("Data received: %s", data);  
+
+30.	// Cyclic Redundancy Check  
+
+31.	    crc();  
+
+32.	// Check if the remainder is zero to find the error  
+
+33.	    for(i=0;(i<N-1) && (check_value[i]!='1');i++);  
+
+34.	        if(i<N-1)  
+
+35.	            printf("\nError detected\n\n");  
+
+36.	        else  
+
+37.	            printf("\nNo error detected\n\n");  
+
+38.	}  
+
+39.	  
+
+40.	void crc(){  
+
+41.	    // initializing check_value  
+
+42.	    for(i=0;i<N;i++)  
+
+43.	        check_value[i]=data[i];  
+
+44.	    do{  
+
+45.	    // check if the first bit is 1 and calls XOR function  
+
+46.	        if(check_value[0]=='1')  
+
+47.	            XOR();  
+
+48.	// Move the bits by 1 position for the next computation  
+
+49.	        for(j=0;j<N-1;j++)  
+
+50.	            check_value[j]=check_value[j+1];  
+
+51.	        // appending a bit from data  
+
+52.	        check_value[j]=data[i++];  
+
+53.	    }while(i<=data_length+N-1);  
+
+54.	// loop until the data ends  
+
+55.	}  
+
+56.	  
+
+57.	int main()  
+
+58.	{  
+
+59.	    // get the data to be transmitted  
+
+60.	    printf("\nEnter data to be transmitted: ");  
+
+61.	    scanf("%s",data);  
+
+62.	    printf("\n Enter the Generating polynomial: ");  
+
+63.	    // get the generator polynomial  
+
+64.	    scanf("%s",gen_poly);  
+
+65.	    // find the length of data  
+
+66.	    data_length=strlen(data);  
+
+67.	    // appending n-1 zeros to the data  
+
+68.	    for(i=data_length;i<data_length+N-1;i++)  
+
+69.	        data[i]='0';  
+
+70.	    printf("\n----------------------------------------");  
+
+71.	// print the data with padded zeros  
+
+72.	    printf("\n Data padded with n-1 zeros : %s",data);  
+
+73.	    printf("\n----------------------------------------");  
+
+74.	// Cyclic Redundancy Check  
+
+75.	    crc();  
+
+76.	// print the computed check value  
+
+77.	    printf("\nCRC or Check value is : %s",check_value);  
+
+78.	// Append data with check_value(CRC)    
+
+79.	    for(i=data_length;i<data_length+N-1;i++)  
+
+80.	        data[i]=check_value[i-data_length];  
+
+81.	    printf("\n----------------------------------------");  
+
+82.	// printing the final data to be sent  
+
+83.	    printf("\n Final data to be sent : %s",data);  
+
+84.	    printf("\n----------------------------------------\n");  
+
+85.	// Calling the receiver function to check errors  
+
+86.	    receiver();  
+
+87.	        return 0;  
+
+88.	}  
+
+
+
